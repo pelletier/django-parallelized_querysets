@@ -11,7 +11,7 @@ and keeping the memory usage low.
 
 ## Usage
 
-### `parallelized_querysets.parallelized_queryset(queryset, processes=None, function=None)`
+### `parallelized_queryset(queryset, processes=None, function=None)`
 
 Process the given `queryset` and return the result as a list.
 
@@ -29,6 +29,7 @@ Apply a function the each result. Does not apply any function by default.
 > 
 > Each time your function returns `None`, the value won't be in the resulting
 > list.
+
 
 > **Note**
 > 
@@ -58,7 +59,7 @@ Do the same but on 6 processes:
                                   function=lambda x: x.append_to_redis())
 
 
-### `parallelized_querysets.parallelized_multiple_querysets(querysets, processes=None, function=None)`
+### `parallelized_multiple_querysets(querysets, processes=None, function=None)`
 
 Same as `parallelized_queryset` but `querysets` is a list of QuerySets.
 
