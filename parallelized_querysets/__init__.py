@@ -4,7 +4,7 @@ __version__ = ".".join(map(str, __version_tuple__))
 
 
 def parallelized_multiple_querysets(querysets, processes=None, function=None):
-    from core import parallelized_multiple_querysets
+    from parallelized_querysets.core import parallelized_multiple_querysets
     return parallelized_multiple_querysets(querysets, processes, function)
 
 
