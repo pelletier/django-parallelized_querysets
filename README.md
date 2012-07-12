@@ -68,6 +68,18 @@ Same as `parallelized_queryset` but `querysets` is a list of QuerySets.
 
     ./tests/sample/manage.py test sample
 
+
+## About `Exception AssertionError: AssertionError()`
+
+You may see the following line (multiple times) on the standard error:
+
+    Exception AssertionError: AssertionError() in <Finalize object, dead> ignored
+
+This is apparently due to a bug in Python, which has been fixed but not yet
+release (at the time of writting).
+
+See http://bugs.python.org/issue14548 for more information on that bug.
+
 ## License
 
 MIT (see LICENSE).
