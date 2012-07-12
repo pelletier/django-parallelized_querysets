@@ -1,12 +1,12 @@
-__version_tuple__ = (0, 0, 1)
+__version_tuple__ = (0, 0, 2)
 __version__ = ".".join(map(str, __version_tuple__))
 
 
 
-def parallelized_multiple_querysets(querysets, processes=None, function=None):
+def parallelized_multiple_querysets(querysets, *args, **kwargs):
     from parallelized_querysets.core import parallelized_multiple_querysets
-    return parallelized_multiple_querysets(querysets, processes, function)
+    return parallelized_multiple_querysets(querysets, *args, **kwargs)
 
 
-def parallelized_queryset(queryset, processes=None, function=None):
-    return parallelized_multiple_querysets([queryset], processes, function)
+def parallelized_queryset(queryset, *args, **kwargs):
+    return parallelized_multiple_querysets([queryset], *args, **kwargs)

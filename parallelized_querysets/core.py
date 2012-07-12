@@ -30,11 +30,17 @@ import datetime
 from math import ceil
 from sys import stdout
 from Queue import Empty as Queue_Empty
-from multiprocessing import Process, Queue, Array, cpu_count
+from multiprocessing import Process, Queue, Array, cpu_count, current_process
 
 from django.db import connection 
 from django.db.models.loading import get_model
 
+
+class CustomProcess(Process):
+
+    def __init__(self, *args, **kwargs):
+        self.data = {}
+        super(CustomProcess, self).__init__(*args, **kwargs)
 
 
 def deconstruct_not_evaluated_queryset(qs):
@@ -63,7 +69,7 @@ def construct_queryset(tup):
 
 
 
-def worker(uid, shared_states, in_queue, out_queue, msg_queue, function):
+def worker(uid, shared_states, in_queue, out_queue, msg_queue, function, init_hook, end_hook):
     """
     Used in a process.
     Takes some tasks from `in_queue` (those are querysets representations + pk
@@ -71,6 +77,9 @@ def worker(uid, shared_states, in_queue, out_queue, msg_queue, function):
     the result to `out_queue` (along with a notification in `msg_queue`).
     """
     chunk_size = 500
+
+    if not init_hook == None:
+        init_hook(current_process())
 
     while True:
         try:
@@ -95,13 +104,18 @@ def worker(uid, shared_states, in_queue, out_queue, msg_queue, function):
                 if function == None:
                     result = row
                 else:
-                    result = function(row)
+                    result = function(current_process(), row)
                 # Return None in your function if you don't want to waste space.
                 if result != None:
                     res.append(result)
             msg_queue.put(min_pk - max_pk)
             gc.collect()
         out_queue.put(res)
+
+    if not end_hook == None:
+        res = end_hook(current_process())
+        if not res == None:
+            out_queue.put([res])
 
     # We are out, mark us as done is the shared states.
     shared_states[uid] = 1
@@ -153,7 +167,8 @@ def writer(msg_queue, total):
             last_output = buff
 
 
-def parallelized_multiple_querysets(querysets, processes=None, function=None):
+def parallelized_multiple_querysets(querysets, processes=None, function=None,
+                                    init_hook=None, end_hook=None):
     """
     Create subtasks to process `querysets`. Fire `processes` processes and
     compute the results of `function` on each row of all querysets. The results
@@ -220,8 +235,10 @@ def parallelized_multiple_querysets(querysets, processes=None, function=None):
                         tasks_queue,   # Input queue.
                         results_queue, # Output queue.
                         msg_queue,     # Messages (information) queue.
-                        function)      # Processing function.
-        Process(target=worker, args=process_args).start()
+                        function,      # Processing function.
+                        init_hook,     # Called when the Process starts
+                        end_hook)      # Called when the Process ends
+        CustomProcess(target=worker, args=process_args).start()
 
     # Create the writer process.
     Process(target=writer, args=(msg_queue, total)).start()

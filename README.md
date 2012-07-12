@@ -23,7 +23,22 @@ Number of processes to create. Defaults to the number returned by
 **`function`**
 
 Apply a function the each result. Does not apply any function by default.
+The first argument is the `Process` which is calling it, and the second is the
+row.
 
+You can also pass two hooks (function that will be executed by the process at
+defined times):
+
+**`init_hook`**
+
+Give it a function taking the `Process` as argument and it will be executed at
+soon as it's created.
+
+**`end_hook`**
+
+Give it a function taking the `Process` as argument and it will be execute right
+before the `Process` exits. If it returns a non-`None` value, it will be
+appended to the results queue.
 
 > **Note**
 > 
@@ -48,7 +63,7 @@ a `append_to_redis` method):
 
     >>> from parallelized_querysets import parallelized_queryset
     >>> qs = Article.objects.all()
-    >>> parallelized_queryset(qs, function=lambda x: x.append_to_redis())
+    >>> parallelized_queryset(qs, function=lambda p, x: x.append_to_redis())
 
 
 Do the same but on 6 processes:
@@ -56,7 +71,7 @@ Do the same but on 6 processes:
     >>> from parallelized_querysets import parallelized_queryset
     >>> qs = Article.objects.all()
     >>> parallelized_queryset(qs, processes=6,
-                                  function=lambda x: x.append_to_redis())
+                                  function=lambda p, x: x.append_to_redis())
 
 
 ### `parallelized_multiple_querysets(querysets, processes=None, function=None)`
