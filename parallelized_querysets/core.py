@@ -32,7 +32,7 @@ from sys import stdout
 from Queue import Empty as Queue_Empty
 from multiprocessing import Process, Queue, Array, cpu_count, current_process
 
-from django.db import connection 
+from django.db import connections
 from django.db.models.loading import get_model
 
 
@@ -225,12 +225,13 @@ def parallelized_multiple_querysets(querysets, processes=None, function=None,
         return []
 
     # This is a hack.
-    # We close the connection now (before forking). So, when any of the
+    # We close the connections now (before forking). So, when any of the
     # subprocess will need a connection to a database, it will need to create
     # it, but this time it will be in its own context.
     # Obviously we can't share the same connection (i.e. UNIX socket) accross the
     # processes.
-    connection.close()
+    for connection in connections.all():
+        connection.close()
 
 
     # Create processes.
