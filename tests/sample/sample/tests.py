@@ -104,3 +104,12 @@ class TestCore(unittest.TestCase):
             Bar.objects.filter(attribute2=3),
         ]
         self.assertEqual(len(parallelized_multiple_querysets(querysets)), 1)
+
+    def test_multidb(self):
+        Foo(attribute1=42).save(using='alt')
+
+        res = parallelized_queryset(Foo.objects.using('default').all())
+        self.assertEqual([12, 4], [x.attribute1 for x in res])
+
+        res = parallelized_queryset(Foo.objects.using('alt').all())
+        self.assertEqual([42], [x.attribute1 for x in res])

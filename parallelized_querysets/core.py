@@ -51,7 +51,11 @@ def deconstruct_not_evaluated_queryset(qs):
     model = qs.model
     app = model._meta.app_label
     name = str(model._meta).split('.')[-1]
-    query = pickle.dumps(qs.query)
+    struct = {
+        'query': qs.query,
+        'db': qs._db
+    }
+    query = pickle.dumps(struct)
 
     return (app, name, query)
 
@@ -63,8 +67,9 @@ def construct_queryset(tup):
     """
     app, name, query = tup
     model = get_model(app, name)
-    qs = model.objects.all()
-    qs.query = pickle.loads(query)
+    struct = pickle.loads(query)
+    qs = model.objects.using(struct['db']).all()
+    qs.query = struct['query']
     return qs
 
 
