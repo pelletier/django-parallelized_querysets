@@ -83,7 +83,7 @@ def worker(uid, shared_states, in_queue, out_queue, msg_queue, function, init_ho
     """
     chunk_size = 500
 
-    if not init_hook == None:
+    if init_hook is not None:
         init_hook(current_process())
 
     while True:
@@ -106,20 +106,20 @@ def worker(uid, shared_states, in_queue, out_queue, msg_queue, function, init_ho
             min_pk = start_pk-i*chunk_size
 
             for row in queryset.filter(pk__gt=max_pk, pk__lte=min_pk):
-                if function == None:
+                if function is None:
                     result = row
                 else:
                     result = function(current_process(), row)
                 # Return None in your function if you don't want to waste space.
-                if result != None:
+                if result is not None:
                     res.append(result)
             msg_queue.put(min_pk - max_pk)
             gc.collect()
         out_queue.put(res)
 
-    if not end_hook == None:
+    if end_hook is not None:
         res = end_hook(current_process())
-        if not res == None:
+        if res is not None:
             out_queue.put([res])
 
     # We are out, mark us as done is the shared states.
@@ -181,7 +181,7 @@ def parallelized_multiple_querysets(querysets, processes=None, function=None,
     """
 
     # Default to the number of available CPUs.
-    if processes == None:
+    if processes is None:
         processes = cpu_count()
 
     # To send tasks to the subprocesses.
