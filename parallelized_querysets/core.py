@@ -210,7 +210,7 @@ def parallelized_multiple_querysets(querysets, processes=None, function=None,
         ordered_query_set = queryset.order_by('-pk')
 
         # Create a string representation of the query in order to pass them to
-        # the workers (QuerySets are not pickleable).
+        # the workers (QuerySet.query are pickleable, but QuerySets are not).
         qs_repr = deconstruct_not_evaluated_queryset(ordered_query_set)
 
         # Create the tasks.
@@ -265,7 +265,7 @@ def parallelized_multiple_querysets(querysets, processes=None, function=None,
             # If the queue is empty and we are not in the expected state, we
             # just keep listening (we consumed results faster than they are
             # produced, yeah!).
-            if shared_states[0:] != expected:
+            if not all(shared_states):
                 time.sleep(0.01)
             # Otherwise we are done.
             else:
