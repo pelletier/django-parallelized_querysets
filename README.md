@@ -3,7 +3,7 @@
 Handle large Django QuerySets by spreading their execution on multiple cores
 and keeping the memory usage low.
 
-[![Build Status](https://travis-ci.org/pelletier/django-parallelized_querysets.png?branch=master)](https://travis-ci.org/pelletier/django-parallelized_querysets)))]]
+[![Build Status](https://travis-ci.org/pelletier/django-parallelized_querysets.png?branch=master)](https://travis-ci.org/pelletier/django-parallelized_querysets)
 
 
 ## Installation
