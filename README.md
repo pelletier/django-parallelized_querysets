@@ -92,8 +92,9 @@ You may see the following line (multiple times) on the standard error:
 
     Exception AssertionError: AssertionError() in <Finalize object, dead> ignored
 
-This is apparently due to a bug in Python, which has been fixed but not yet
-release (at the time of writting).
+This is a bug in Python's garbage collector (running right after a fork), which
+has been fixed in
+[Python 3.3.0 alpha4](http://hg.python.org/cpython/file/59567c117b0e/Misc/NEWS#l47).
 
 See http://bugs.python.org/issue14548 for more information on that bug.
 
